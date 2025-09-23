@@ -7,6 +7,7 @@
 #define IMU_PORT 12
 #define FWD_PORT 16, false
 #define LAT_PORT 15, false
+#define COLOR_PORT 11
 
 //const int ROLLERS_IN = 12000;
 
@@ -84,6 +85,7 @@ extern rev::Motor_Group winch;
 extern pros::IMU imu;
 extern pros::Rotation fwd;
 extern pros::Rotation lat;
+extern pros::Optical color_sensor_tester;
 
 
 // Beam Break

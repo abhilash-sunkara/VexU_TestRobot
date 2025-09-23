@@ -23,6 +23,8 @@ using namespace std;
 #define DRIVER1 0
 
 void print_position();
+void print_color_sensor(int* bbs, int* rbs);
+void update_balls_seen(int* bbs, int* rbs, double* lv_r, double* lv_b);
 void receive_data(std::string sender, std::string message);
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -262,6 +264,13 @@ void opcontrol()
 	auto last_time = std::chrono::high_resolution_clock::now();
 	int starting;
 
+	int blue_balls_seen = 0;
+	int red_balls_seen = 0;
+	double past_red_value = 0;
+	double past_blue_value = 0;
+
+
+	color_sensor_tester.set_led_pwm(90);
 	// mogo clamp controls
 	bool l1Down = false;
 	bool mogoClampDown = false;
@@ -274,7 +283,9 @@ void opcontrol()
 		auto time = std::chrono::high_resolution_clock::now();
 
 		pros::delay(20);
-		print_position();
+
+		update_balls_seen(&blue_balls_seen, &red_balls_seen, &past_red_value, &past_blue_value);
+		print_color_sensor(&blue_balls_seen, &red_balls_seen);
 		/* pros::lcd::set_text(0, std::to_string(odom->get_state().pos.x.convert(inch)));
 		pros::lcd::set_text(1, std::to_string(odom->get_state().pos.y.convert(inch)));
 		pros::lcd::set_text(2, std::to_string(odom->get_state().pos.theta.convert(degree)));
@@ -435,4 +446,27 @@ void print_position()
 	pros::lcd::set_text(1, to_string(odom->get_state().pos.x.convert(inch)));
 	pros::lcd::set_text(2, to_string(odom->get_state().pos.y.convert(inch)));
 	pros::lcd::set_text(3, to_string(odom->get_state().pos.theta.convert(degree)));
+}
+
+void print_color_sensor(int* bbs, int* rbs){
+	pros::lcd::set_text(0, "Printing to LCD: Color Sensor Values");
+	pros::lcd::set_text(1, to_string(color_sensor_tester.get_hue()));
+	pros::lcd::set_text(2, to_string(color_sensor_tester.get_rgb().red));
+	pros::lcd::set_text(3, to_string(color_sensor_tester.get_rgb().green));
+	pros::lcd::set_text(4, to_string(color_sensor_tester.get_rgb().blue));
+	pros::lcd::set_text(5, to_string(*bbs));
+	pros::lcd::set_text(6, to_string(*rbs));
+	
+}
+
+void update_balls_seen(int* bbs, int* rbs, double* lv_r, double* lv_b){
+	if(color_sensor_tester.get_rgb().blue - *lv_b > 50){
+		(*bbs)++;
+	}
+	if(color_sensor_tester.get_rgb().red - *lv_r > 50){
+		(*rbs)++;
+	}
+	*lv_r = color_sensor_tester.get_rgb().red;
+	*lv_b = color_sensor_tester.get_rgb().blue;
+	pros::delay(20);
 }

@@ -46,6 +46,7 @@ pros::IMU imu(IMU_PORT);
 pros::Rotation fwd(FWD_PORT);
 pros::Rotation lat(LAT_PORT);
 pros::Optical color_sensor(COLOR_SENSOR_1_PORT);
+pros::Optical color_sensor_tester(COLOR_PORT);
 pros::ADIDigitalIn beam_break(BEAM_BREAK_PORT);
 
 
