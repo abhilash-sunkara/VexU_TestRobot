@@ -270,14 +270,14 @@ void opcontrol()
 	double past_blue_value = 0;
 
 
-	color_sensor_tester.set_led_pwm(90);
+	
 	// mogo clamp controls
 	bool l1Down = false;
 	bool mogoClampDown = false;
 
 	while (true)
 	{
-		
+		color_sensor_tester.set_led_pwm(90);
 		starting = -controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
 
 		auto time = std::chrono::high_resolution_clock::now();
@@ -309,7 +309,7 @@ void opcontrol()
 		left_motor_group.move_voltage((int)((double)(starting + turn) / 150 * 12000));
 		right_motor_group.move_voltage((int)((double)(starting - turn) / 150 * 12000));
 
-		// intake arm controls
+		// intake arm controls	
 
 		if (master.get_digital(DIGITAL_L2))
 		{
@@ -450,23 +450,24 @@ void print_position()
 
 void print_color_sensor(int* bbs, int* rbs){
 	pros::lcd::set_text(0, "Printing to LCD: Color Sensor Values");
-	pros::lcd::set_text(1, to_string(color_sensor_tester.get_hue()));
-	pros::lcd::set_text(2, to_string(color_sensor_tester.get_rgb().red));
-	pros::lcd::set_text(3, to_string(color_sensor_tester.get_rgb().green));
-	pros::lcd::set_text(4, to_string(color_sensor_tester.get_rgb().blue));
-	pros::lcd::set_text(5, to_string(*bbs));
-	pros::lcd::set_text(6, to_string(*rbs));
+	pros::lcd::set_text(1, "hue : " + to_string(color_sensor_tester.get_hue()));
+	pros::lcd::set_text(2, "red : " + to_string(color_sensor_tester.get_rgb().red));
+	pros::lcd::set_text(3, "green : " + to_string(color_sensor_tester.get_rgb().green));
+	pros::lcd::set_text(4, "blue : " + to_string(color_sensor_tester.get_rgb().blue));
+	pros::lcd::set_text(5, "blue balls: " + to_string(*bbs));
+	pros::lcd::set_text(6, "red balls: " + to_string(*rbs));
 	
 }
 
 void update_balls_seen(int* bbs, int* rbs, double* lv_r, double* lv_b){
-	if(color_sensor_tester.get_rgb().blue - *lv_b > 50){
+	double current_red = color_sensor_tester.get_rgb().red;
+	double current_blue = color_sensor_tester.get_rgb().blue;
+	if(current_blue > 100 && current_red < 100 && *lv_b < 100){
 		(*bbs)++;
-	}
-	if(color_sensor_tester.get_rgb().red - *lv_r > 50){
+	} else if(current_red > 100 && current_blue < 70 && *lv_r < 100){
 		(*rbs)++;
 	}
-	*lv_r = color_sensor_tester.get_rgb().red;
-	*lv_b = color_sensor_tester.get_rgb().blue;
+	*lv_r = current_red;
+	*lv_b = current_blue;
 	pros::delay(20);
 }
